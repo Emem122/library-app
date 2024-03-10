@@ -4,7 +4,6 @@ import { auth, db } from '@/firebase';
 import { User } from '@/types/user';
 import { onAuthStateChanged, signOut } from 'firebase/auth';
 import { doc, getDoc } from 'firebase/firestore';
-import { useRouter } from 'next/navigation';
 import { createContext, useContext, useEffect, useState } from 'react';
 
 type AuthProviderProps = {
@@ -19,19 +18,27 @@ const AuthContext = createContext<UserContextType>(undefined);
 const HandleAuthContext = createContext<HandleAuthType | undefined>(undefined);
 
 export const AuthProvider = ({ children }: AuthProviderProps) => {
-  const router = useRouter();
-
-  const [currentUser, setCurrentUser] = useState<UserContextType>(undefined);
+  const [currentUser, setCurrentUser] = useState<UserContextType>(null);
   const [loading, setLoading] = useState<Boolean>(true);
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async loginUser => {
       try {
         if (loginUser) {
-          setCurrentUser({
-            id: loginUser.uid,
-            name: loginUser.displayName,
-          });
+          const getUserData = async () => {
+            const docRef = doc(db, 'users', loginUser.uid);
+            const docSnap = await getDoc(docRef);
+
+            if (docSnap.exists()) {
+              const id = docSnap.data().id;
+              const name = docSnap.data().name;
+
+              setCurrentUser({ id, name });
+            } else {
+              console.log('No such document exist');
+            }
+          };
+          await getUserData();
 
           setLoading(false);
         } else {
@@ -43,9 +50,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       }
     });
 
-    return () => {
-      unsubscribe();
-    };
+    return unsubscribe;
   }, []);
 
   const handleLogout = async () => {
@@ -53,14 +58,12 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     setCurrentUser(null);
   };
 
-  // useEffect(() => {
-  //   // console.log(`user: ${currentUser?.name}`);
-
-  //   console.log(currentUser);
-  // }, [currentUser]);
+  useEffect(() => {
+    // console.log(`user: ${currentUser?.name}`);
+  }, [currentUser]);
 
   // if (currentUser === null) {
-  //   router.push('/');
+  //   router.push('/register');
   // }
 
   if (loading) {

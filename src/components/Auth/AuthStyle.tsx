@@ -1,3 +1,4 @@
+import { useAuth } from '@/providers/auth';
 import Link from 'next/link';
 
 type AuthStyleProps = {
@@ -13,17 +14,28 @@ export default function AuthStyle({
   linkText,
   children,
 }: AuthStyleProps) {
+  const currentUser = useAuth();
+
   return (
     <>
-      <h1>{title}</h1>
-      <div>
-        {children}
-        <Link
-          href={linkRef}
-          className="text-blue-600 underline underline-offset-4">
-          {linkText}
-        </Link>
-      </div>
+      {currentUser ? (
+        <>
+          <p>すでにログイン済みです。</p>
+          <Link href="/">ホームへ戻る</Link>
+        </>
+      ) : (
+        <>
+          <h1>{title}</h1>
+          <div>
+            {children}
+            <Link
+              href={linkRef}
+              className="text-blue-600 underline underline-offset-4">
+              {linkText}
+            </Link>
+          </div>
+        </>
+      )}{' '}
     </>
   );
 }
