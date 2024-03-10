@@ -1,54 +1,29 @@
 'use client';
 
 import AuthStyle from '@/components/Auth/AuthStyle';
-import { auth, db } from '@/firebase';
-import {
-  GoogleAuthProvider,
-  signInWithEmailAndPassword,
-  signInWithPopup,
-} from 'firebase/auth';
-import { doc, setDoc } from 'firebase/firestore';
-import { useRouter } from 'next/navigation';
+import { useAuth } from '@/providers/auth';
 import { useState } from 'react';
 
 export default function Page() {
-  const router = useRouter();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [invalid, setInvalid] = useState(false);
+
+  const googleLogin = useAuth(state => state.googleLogIn);
+  const emailLogin = useAuth(state => state.emailLogin);
+  const invalidUser = useAuth(state => state.invalidUser);
 
   const handleGoogleLogin = async () => {
-    const provider = new GoogleAuthProvider();
-    const userCredential = await signInWithPopup(auth, provider);
-    const user = userCredential.user;
-
-    const docRef = await setDoc(doc(db, 'users', user.uid), {
-      name: user.displayName,
-      id: user.uid,
-    });
-
-    router.push('/');
+    googleLogin();
   };
 
   const handleEmailLogin = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    emailLogin(email, password);
 
-    signInWithEmailAndPassword(auth, email, password)
-      .then(userCredential => {
-        const user = userCredential.user;
-
-        router.push('/');
-      })
-      .catch(error => {
-        const errorCode = error.code;
-        const errorMessage = error.message;
-
-        console.log(error);
-
-        if (errorCode === 'auth/invalid-credential') {
-          setInvalid(true);
-        }
-      });
+    if (invalidUser) {
+      setEmail('');
+      setPassword('');
+    }
   };
 
   return (
@@ -82,9 +57,9 @@ export default function Page() {
             />
             <button>email register</button>
           </form>
-          {invalid && (
+          {invalidUser && (
             <div>
-              <p>ログインできません。</p>
+              <p>ログイン情報が間違っています。もう一度お試しください。</p>
             </div>
           )}
         </main>

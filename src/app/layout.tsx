@@ -1,7 +1,7 @@
-import { AuthProvider } from '@/providers/auth';
 import type { Metadata } from 'next';
 import { Noto_Sans_JP } from 'next/font/google';
 import './globals.css';
+import { AuthProvider } from '@/providers/authContext';
 
 const NotoSansJp = Noto_Sans_JP({
   subsets: ['latin'],

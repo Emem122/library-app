@@ -1,73 +1,26 @@
 'use client';
 
 import AuthStyle from '@/components/Auth/AuthStyle';
-import { auth, db } from '@/firebase';
 import { useAuth } from '@/providers/auth';
-import {
-  GoogleAuthProvider,
-  createUserWithEmailAndPassword,
-  signInWithPopup,
-  updateProfile,
-} from 'firebase/auth';
-import { doc, setDoc } from 'firebase/firestore';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 
 export default function Page() {
-  const router = useRouter();
-  const currentUser = useAuth();
+  const googleSignIn = useAuth(state => state.googleSignIn);
+  const alreadyExist = useAuth(state => state.alreadyExist);
+  const emailSignIn = useAuth(state => state.emailSignIn);
 
-  const [name, setName] = useState('');
+  const [inputName, setInputName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [alreadyExist, setAlreadyExist] = useState(false);
 
   const handleGoogleRegister = async () => {
-    const provider = new GoogleAuthProvider();
-    const userCredential = await signInWithPopup(auth, provider);
-    const user = userCredential.user;
-
-    const docRef = await setDoc(doc(db, 'users', user.uid), {
-      name: user.displayName,
-      id: user.uid,
-    });
-
-    router.push('/');
+    googleSignIn();
   };
 
   const handleEmailRegister = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    try {
-      const userCredential = await createUserWithEmailAndPassword(
-        auth,
-        email,
-        password,
-      );
-
-      const user = userCredential.user;
-
-      const currentUser = auth?.currentUser;
-      if (currentUser !== null) {
-        await updateProfile(currentUser, {
-          displayName: name,
-        });
-      } else {
-        console.log('handleRegister: currentUser is null');
-      }
-
-      const docRef = await setDoc(doc(db, 'users', user.uid), {
-        name: user.displayName,
-        id: user.uid,
-      });
-
-      router.push('/');
-    } catch (error) {
-      const firebaseError = error as { code: string; message: string };
-      console.log(firebaseError.code, firebaseError.message);
-      if (firebaseError.code === 'auth/email-already-in-use')
-        setAlreadyExist(true);
-    }
+    emailSignIn(email, password, inputName);
   };
 
   return (
@@ -84,8 +37,8 @@ export default function Page() {
               id="name"
               name="name"
               className="border"
-              value={name}
-              onChange={e => setName(e.target.value)}
+              value={inputName}
+              onChange={e => setInputName(e.target.value)}
             />
             <label htmlFor="email">Email</label>
             <input
@@ -119,7 +72,6 @@ export default function Page() {
                 <Link href="/login" className="text-blue-600">
                   Login page
                 </Link>
-                .
               </p>
             </div>
           )}

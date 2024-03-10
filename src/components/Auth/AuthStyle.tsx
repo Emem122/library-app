@@ -1,5 +1,9 @@
+'use client';
+
 import { useAuth } from '@/providers/auth';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { useEffect } from 'react';
 
 type AuthStyleProps = {
   title: string;
@@ -14,15 +18,25 @@ export default function AuthStyle({
   linkText,
   children,
 }: AuthStyleProps) {
-  const currentUser = useAuth();
+  const router = useRouter();
+
+  const currentUser = useAuth(state => state.currentUser);
+  const loading = useAuth(state => state.loading);
+
+  useEffect(() => {
+    if (!loading && currentUser !== null) {
+      setTimeout(() => {
+        router.push('/home');
+      }, 1000);
+    }
+  }, [currentUser, loading, router]);
 
   return (
     <>
-      {currentUser ? (
-        <>
-          <p>すでにログイン済みです。</p>
-          <Link href="/">ホームへ戻る</Link>
-        </>
+      {loading ? (
+        <p>loading...</p>
+      ) : currentUser !== null ? (
+        <p>redirect to home...</p>
       ) : (
         <>
           <h1>{title}</h1>
@@ -35,7 +49,7 @@ export default function AuthStyle({
             </Link>
           </div>
         </>
-      )}{' '}
+      )}
     </>
   );
 }
