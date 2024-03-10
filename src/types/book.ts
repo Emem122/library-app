@@ -1,7 +1,8 @@
 export type Book = {
   title: string;
   id: string;
-  addedDate: Date;
+  addedDate: string;
   available: boolean;
-  borrower: string;
+  borrower: string | null;
+  genres: string[];
 };

@@ -1,7 +1,7 @@
 export default function Page() {
   return (
     <>
-      <p>search</p>
+      <h1>search</h1>
     </>
   );
 }
