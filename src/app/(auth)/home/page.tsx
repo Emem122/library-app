@@ -23,7 +23,7 @@ export default function Page() {
         <button onClick={handleSignOut}>logout</button>
         <hr />
         <Link href="/add">add book</Link>
-        <Link href="/search">search book</Link>
+        <Link href="/list">see book</Link>
       </div>
     </>
   );
