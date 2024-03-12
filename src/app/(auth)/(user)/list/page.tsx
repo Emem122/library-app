@@ -19,19 +19,15 @@ export default function Page() {
   const [books, setBooks] = useState<Book[]>([]);
   const [page, setPage] = useState(1);
   const [lastPage, setLastPage] = useState(1);
-  const NUM_OF_ITEMS = 1;
+  const NUM_OF_ITEMS = 3;
 
   useEffect(() => {
-    //   const result = await firestore().collection('コレクション名')
-    // .orderBy('createdAt', 'desc')
-    // .limit(10)
-    // .get();
-
     const readBook = async () => {
       const col = collection(db, 'books');
 
       const count = (await getCountFromServer(query(col))).data().count || 0;
-      setLastPage(Math.floor(count / NUM_OF_ITEMS) + 1);
+
+      setLastPage(Math.floor(count / NUM_OF_ITEMS));
 
       const querySnapshot = await getDocs(
         query(col, orderBy('addedDate', 'desc'), limit(NUM_OF_ITEMS)),
@@ -40,7 +36,6 @@ export default function Page() {
       querySnapshot.forEach(doc => {
         ret.push(doc.data() as Book);
       });
-      console.log(ret);
       return ret;
     };
 
@@ -66,10 +61,22 @@ export default function Page() {
     console.log(ret);
     return ret;
   }
-
-  useEffect(() => {
-    console.log(lastPage);
-  }, [lastPage]);
+  async function fetchPrev(): Promise<Book[]> {
+    const col = collection(db, 'books');
+    const querySnapshot = await getDocs(
+      query(
+        col,
+        orderBy('addedDate', 'desc'),
+        endBefore(books[0].addedDate),
+        limitToLast(NUM_OF_ITEMS),
+      ),
+    );
+    const ret: Book[] = [];
+    querySnapshot.forEach(doc => {
+      ret.push(doc.data() as Book);
+    });
+    return ret;
+  }
 
   const handleNext = () => {
     if (page >= lastPage) return;
@@ -78,6 +85,17 @@ export default function Page() {
     fetchNext().then(books => {
       setBooks(books);
       setPage(nextPage);
+    });
+  };
+
+  const handlePrev = () => {
+    if (page <= 1) return;
+
+    const prevPage = page - 1;
+
+    fetchPrev().then(books => {
+      setBooks(books);
+      setPage(prevPage);
     });
   };
 
@@ -107,7 +125,21 @@ export default function Page() {
               );
             })}
           </ul>
-          <button onClick={handleNext}>next</button>
+          <button
+            onClick={handlePrev}
+            disabled={page == 1}
+            className="disabled:bg-blue-200 bg-blue-500 text-white">
+            prev
+          </button>
+          <p>
+            {page}/{lastPage}
+          </p>
+          <button
+            onClick={handleNext}
+            disabled={page >= lastPage}
+            className="disabled:bg-blue-200 bg-blue-500 text-white">
+            next
+          </button>
         </div>
       )}
     </>

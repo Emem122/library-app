@@ -1,28 +1,9 @@
 'use client';
 
-import { useAuth } from '@/providers/auth';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
-import { useEffect } from 'react';
 
 export default function Home() {
-  const currentUser = useAuth(state => state.currentUser);
-  const loading = useAuth(state => state.loading);
-  const router = useRouter();
-
-  useEffect(() => {
-    if (!loading && currentUser !== null) {
-      setTimeout(() => {
-        router.push('/home');
-      }, 1000);
-    }
-  }, [currentUser, loading, router]);
-
-  return loading ? (
-    <p>loading...</p>
-  ) : currentUser !== null ? (
-    <p>redirect to home...</p>
-  ) : (
+  return (
     <main>
       <>
         <h1>ようこそ</h1>

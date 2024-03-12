@@ -35,7 +35,7 @@ export const useAuth = create<AuthState>()(
   (persist as MyPersist)(
     set => ({
       currentUser: undefined,
-      loading: true,
+      loading: false,
       alreadyExist: false,
       invalidUser: false,
       googleSignIn: async () => {
