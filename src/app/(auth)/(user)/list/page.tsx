@@ -1,5 +1,6 @@
 'use client';
 
+import BookItem from '@/components/Book/BookItem';
 import { db } from '@/firebase';
 import { Book } from '@/types/book';
 import {
@@ -16,6 +17,8 @@ import {
 import { useEffect, useState } from 'react';
 
 export default function Page() {
+  const [isDetailShow, setIsDetailShow] = useState(false);
+  const [activeBook, setActiveBook] = useState<Book | null>(null);
   const [books, setBooks] = useState<Book[]>([]);
   const [page, setPage] = useState(1);
   const [lastPage, setLastPage] = useState(1);
@@ -58,7 +61,6 @@ export default function Page() {
     querySnapshot.forEach(doc => {
       ret.push(doc.data() as Book);
     });
-    console.log(ret);
     return ret;
   }
   async function fetchPrev(): Promise<Book[]> {
@@ -99,47 +101,84 @@ export default function Page() {
     });
   };
 
+  const showBookDetail = (book: Book): void => {
+    if (isDetailShow) return;
+    setIsDetailShow(prev => !prev);
+    setActiveBook(book);
+  };
+
+  const closeBookDetail = () => {
+    if (!isDetailShow) return;
+    setIsDetailShow(prev => !prev);
+    setActiveBook(null);
+  };
+
+  useEffect(() => {
+    console.log(isDetailShow);
+    console.log(activeBook);
+  }, [isDetailShow, activeBook]);
+
   return (
     <>
-      <h1>list</h1>
-      {books.length > 0 && (
-        <div>
+      {isDetailShow && (
+        <div
+          onClick={closeBookDetail}
+          className="w-screen h-screen bg-slate-900 opacity-40 backdrop-blur-md absolute top-0 left-0"></div>
+      )}
+      <div>
+        <h1>list</h1>
+        {books.length > 0 && (
+          <div>
+            <ul>
+              {books.map(book => {
+                return (
+                  <BookItem
+                    key={book.id}
+                    book={book}
+                    showBookDetail={() => showBookDetail(book)}
+                  />
+                );
+              })}
+            </ul>
+            <button
+              onClick={handlePrev}
+              disabled={page == 1}
+              className="disabled:bg-blue-200 bg-blue-500 text-white">
+              prev
+            </button>
+            <p>
+              {page}/{lastPage}
+            </p>
+            <button
+              onClick={handleNext}
+              disabled={page >= lastPage}
+              className="disabled:bg-blue-200 bg-blue-500 text-white">
+              next
+            </button>
+          </div>
+        )}
+      </div>
+      {isDetailShow && (
+        <div className="absolute w-1/2 h-1/2 bg-white left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 p-10">
+          <h2 className="text-2xl">{activeBook?.title}</h2>
           <ul>
-            {books.map(book => {
-              return (
-                <li key={book.id} className="my-5 bg-slate-100">
-                  <p>{book.title}</p>
-                  <p>{book.available ? 'available' : 'unavailable'}</p>
-                  <ul>
-                    {book.genres.map(genre => {
-                      return (
-                        <li
-                          key={genre}
-                          className="list-inside list-item list-disc">
-                          {genre}
-                        </li>
-                      );
-                    })}
-                  </ul>
-                </li>
-              );
-            })}
+            <li>追加日：{activeBook?.addedDate.substring(0, 10)}</li>
+            <li>在庫：{activeBook?.available ? '在庫あり' : '貸出中'}</li>
+            <li>借用人：{activeBook?.borrower ? activeBook.borrower : '-'}</li>
+            <li>
+              カテゴリー：
+              {activeBook?.genres.map((genre, index) => {
+                return (
+                  <span
+                    className="mx-1 py-0.5 px-1 border border-slate-300 rounded-md"
+                    key={index}>
+                    {genre}
+                  </span>
+                );
+              })}
+            </li>
           </ul>
-          <button
-            onClick={handlePrev}
-            disabled={page == 1}
-            className="disabled:bg-blue-200 bg-blue-500 text-white">
-            prev
-          </button>
-          <p>
-            {page}/{lastPage}
-          </p>
-          <button
-            onClick={handleNext}
-            disabled={page >= lastPage}
-            className="disabled:bg-blue-200 bg-blue-500 text-white">
-            next
-          </button>
+          <button>貸出</button>
         </div>
       )}
     </>
