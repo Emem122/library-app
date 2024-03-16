@@ -2,9 +2,11 @@
 
 import BookItem from '@/components/Book/BookItem';
 import { db } from '@/firebase';
+import { useAuth } from '@/providers/auth';
 import { Book } from '@/types/book';
 import {
   collection,
+  doc,
   endBefore,
   getCountFromServer,
   getDocs,
@@ -12,6 +14,7 @@ import {
   limitToLast,
   orderBy,
   query,
+  setDoc,
   startAfter,
 } from 'firebase/firestore';
 import { useEffect, useState } from 'react';
@@ -23,6 +26,8 @@ export default function Page() {
   const [page, setPage] = useState(1);
   const [lastPage, setLastPage] = useState(1);
   const NUM_OF_ITEMS = 3;
+
+  const currentUser = useAuth(state => state.currentUser);
 
   useEffect(() => {
     const readBook = async () => {
@@ -113,10 +118,43 @@ export default function Page() {
     setActiveBook(null);
   };
 
-  useEffect(() => {
-    console.log(isDetailShow);
-    console.log(activeBook);
-  }, [isDetailShow, activeBook]);
+  const handleCheckout = async (book: Book): Promise<void> => {
+    const bookData: Book = book;
+
+    const docRef = await setDoc(doc(db, 'books', book.id), {
+      ...bookData,
+      available: false,
+      borrower: currentUser ? currentUser.id : null,
+    });
+
+    setActiveBook(prev => {
+      if (prev === null) return prev;
+      return {
+        ...prev,
+        available: false,
+        borrower: currentUser ? currentUser.id : null,
+      };
+    });
+  };
+
+  const handleReturn = async (book: Book): Promise<void> => {
+    const bookData: Book = book;
+
+    const docRef = await setDoc(doc(db, 'books', book.id), {
+      ...bookData,
+      available: true,
+      borrower: null,
+    });
+
+    setActiveBook(prev => {
+      if (prev === null) return prev;
+      return {
+        ...prev,
+        available: true,
+        borrower: null,
+      };
+    });
+  };
 
   return (
     <>
@@ -164,7 +202,6 @@ export default function Page() {
           <ul>
             <li>追加日：{activeBook?.addedDate.substring(0, 10)}</li>
             <li>在庫：{activeBook?.available ? '在庫あり' : '貸出中'}</li>
-            <li>借用人：{activeBook?.borrower ? activeBook.borrower : '-'}</li>
             <li>
               カテゴリー：
               {activeBook?.genres.map((genre, index) => {
@@ -178,7 +215,15 @@ export default function Page() {
               })}
             </li>
           </ul>
-          <button>貸出</button>
+          {activeBook ? (
+            activeBook.available ? (
+              <button onClick={() => handleCheckout(activeBook)}>貸出</button>
+            ) : activeBook.borrower === currentUser?.id ? (
+              <button onClick={() => handleReturn(activeBook)}>返却</button>
+            ) : (
+              <p>現在貸出中です</p>
+            )
+          ) : null}
         </div>
       )}
     </>
