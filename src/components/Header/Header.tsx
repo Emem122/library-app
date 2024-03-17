@@ -3,21 +3,12 @@
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/providers/auth';
 import Link from 'next/link';
-import { useEffect, useState } from 'react';
+import useUserStatus from '@/hooks/useUserStatus';
 
 export default function Header() {
   const router = useRouter();
   const currentUser = useAuth(state => state.currentUser);
-
-  const [userStatus, setUserStatus] = useState('loading');
-
-  useEffect(() => {
-    if (currentUser === null) {
-      setUserStatus('no login');
-    } else if (currentUser !== null && currentUser !== undefined) {
-      setUserStatus('logged in');
-    }
-  }, [currentUser, router]);
+  const userStatus = useUserStatus();
 
   const logOut = useAuth(state => state.logOut);
 

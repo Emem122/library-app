@@ -1,36 +1,29 @@
 'use client';
 
-import { useAuth } from '@/providers/auth';
-import { useRouter } from 'next/navigation';
-import { useEffect } from 'react';
+import useUserStatus from '@/hooks/useUserStatus';
 
 export default function AuthLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const router = useRouter();
+  const userStatus = useUserStatus();
 
-  const currentUser = useAuth(state => state.currentUser);
-  const loading = useAuth(state => state.loading);
+  return (
+    <>
+      {userStatus === 'loading' && (
+        <p className="text-slate-500 text-sm text-center">ローディング...</p>
+      )}
 
-  useEffect(() => {
-    if (!loading && currentUser === null) {
-      setTimeout(() => {
-        router.push('/');
-      }, 1500);
-    }
-  }, [currentUser, loading, router]);
+      {userStatus === 'logged in' && <>{children}</>}
 
-  return loading ? (
-    <p className="text-slate-500 text-sm text-center">ローディング...</p>
-  ) : currentUser !== null ? (
-    <>{children}</>
-  ) : (
-    <p className="text-slate-500 text-sm text-center">
-      ログインしていません。
-      <br />
-      ログイン画面へ戻ります。
-    </p>
+      {userStatus === 'no login' && (
+        <p className="text-slate-500 text-sm text-center">
+          ログインしていません。
+          <br />
+          ログイン画面へ戻ります。
+        </p>
+      )}
+    </>
   );
 }

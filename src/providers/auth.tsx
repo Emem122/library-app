@@ -14,7 +14,6 @@ import { PersistOptions, persist } from 'zustand/middleware';
 
 type AuthState = {
   currentUser: User | null | undefined;
-  loading: boolean;
   alreadyExist: boolean;
   invalidUser: boolean;
   googleSignIn: () => void;
@@ -22,7 +21,6 @@ type AuthState = {
   googleLogIn: () => void;
   emailLogin: (email: string, password: string) => void;
   logOut: () => void;
-  setLoading: (boolean: boolean) => void;
   setCurrentUser: (user: User | null | undefined) => void;
 };
 
@@ -35,7 +33,6 @@ export const useAuth = create<AuthState>()(
   (persist as MyPersist)(
     set => ({
       currentUser: undefined,
-      loading: false,
       alreadyExist: false,
       invalidUser: false,
       googleSignIn: async () => {
@@ -49,7 +46,6 @@ export const useAuth = create<AuthState>()(
         });
 
         set({
-          loading: false,
           alreadyExist: false,
           invalidUser: false,
         });
@@ -75,7 +71,6 @@ export const useAuth = create<AuthState>()(
 
           set({
             currentUser: { id: user.uid, name: user.displayName },
-            loading: false,
             alreadyExist: false,
             invalidUser: false,
           });
@@ -99,7 +94,6 @@ export const useAuth = create<AuthState>()(
         });
 
         set({
-          loading: false,
           alreadyExist: false,
           invalidUser: false,
         });
@@ -109,7 +103,6 @@ export const useAuth = create<AuthState>()(
           .then(userCredential => {
             const user = userCredential.user;
             set({
-              loading: false,
               alreadyExist: false,
               invalidUser: false,
             });
@@ -131,9 +124,6 @@ export const useAuth = create<AuthState>()(
           alreadyExist: false,
           invalidUser: false,
         });
-      },
-      setLoading: boolean => {
-        set({ loading: boolean });
       },
 
       setCurrentUser: user => {

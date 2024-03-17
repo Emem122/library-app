@@ -1,28 +1,10 @@
 'use client';
 
-import { useAuth } from '@/providers/auth';
+import useUserStatus from '@/hooks/useUserStatus';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react';
 
 export default function Home() {
-  const router = useRouter();
-
-  const currentUser = useAuth(state => state.currentUser);
-  const [userStatus, setUserStatus] = useState('loading');
-
-  useEffect(() => {
-    console.log(currentUser);
-
-    if (currentUser === null) {
-      setUserStatus('no login');
-    } else if (currentUser !== null && currentUser !== undefined) {
-      setUserStatus('logged in');
-      setTimeout(() => {
-        router.push('/home');
-      }, 1500);
-    }
-  }, [currentUser, router]);
+  const userStatus = useUserStatus();
 
   return (
     <div className="max-w-lg mx-auto">
