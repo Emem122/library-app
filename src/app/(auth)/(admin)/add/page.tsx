@@ -67,46 +67,57 @@ export default function Page() {
   }, [isToastShow]);
 
   return (
-    <>
-      <h1>add</h1>
+    <div className="px-5 mt-10 max-w-md mx-auto">
+      <h1 className="text-center mb-4">新規追加</h1>
       <form onSubmit={handleSubmit}>
         <div>
-          <label htmlFor="title">book title</label>
+          <label
+            className="block text-blue-400 text-sm font-semibold mb-2"
+            htmlFor="title">
+            タイトル
+          </label>
           <input
             required
-            className="border"
+            className="p-1 rounded-sm border w-full focus-visible:outline-blue-500"
             type="text"
             id="title"
             value={title}
             onChange={e => setTitle(e.target.value)}
           />
         </div>
-        <ul>
-          {genres.map((genre, index) => {
-            return (
-              <li key={genre.id}>
-                <input
-                  className="border"
-                  type="checkbox"
-                  id={genre.name}
-                  value={genre.name}
-                  onChange={handleGenres}
-                  ref={el => {
-                    if (el) {
-                      checkboxRefs.current[index] = el;
-                    }
-                  }}
-                />
-                <label htmlFor={genre.name}>{genre.name}</label>
-              </li>
-            );
-          })}
-        </ul>
-        <button className="bg-blue-500 text-white">add</button>
+        <div className="mt-5">
+          <p className="text-blue-400 text-sm font-semibold mb-2">カテゴリ</p>
+          <ul className="flex flex-wrap gap-x-4 gap-y-2">
+            {genres.map((genre, index) => {
+              return (
+                <li key={genre.id} className="flex gap-1 items-center">
+                  <input
+                    className="border accent-blue-500"
+                    type="checkbox"
+                    id={genre.name}
+                    value={genre.name}
+                    onChange={handleGenres}
+                    ref={el => {
+                      if (el) {
+                        checkboxRefs.current[index] = el;
+                      }
+                    }}
+                  />
+                  <label htmlFor={genre.name}>{genre.name}</label>
+                </li>
+              );
+            })}
+          </ul>
+        </div>
+        <div className="mt-8 flex justify-center">
+          <button className="bg-blue-500 text-white px-8 py-2 shadow rounded hover:bg-blue-400">
+            追加する
+          </button>
+        </div>
       </form>
       {isToastShow && (
-        <div className="p-10 shadow-lg fixed bottom-10 right-10">success!</div>
+        <div className="p-10 shadow-lg fixed bottom-10 right-10">追加完了</div>
       )}
-    </>
+    </div>
   );
 }

@@ -11,7 +11,6 @@ type UserContextType = User | null | undefined;
 
 const AuthContext = createContext<UserContextType>(undefined);
 
-// 以下を追加
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const currentUser = useAuth(state => state.currentUser);
   const setCurrentUser = useAuth(state => state.setCurrentUser);
@@ -38,9 +37,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       } else {
         setCurrentUser(null);
       }
-
-      return unsubscribe;
     });
+    return () => unsubscribe();
   }, [setCurrentUser]);
 
   return (

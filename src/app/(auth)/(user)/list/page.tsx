@@ -1,5 +1,6 @@
 'use client';
 
+import BookDetail from '@/components/Book/BookDetail';
 import BookItem from '@/components/Book/BookItem';
 import { db } from '@/firebase';
 import { useAuth } from '@/providers/auth';
@@ -135,6 +136,18 @@ export default function Page() {
         borrower: currentUser ? currentUser.id : null,
       };
     });
+
+    setBooks(prev => {
+      const prevBooks = prev;
+      prevBooks.map(prevBook => {
+        if (prevBook.id === bookData.id) {
+          prevBook.available = false;
+          prevBook.borrower = currentUser ? currentUser.id : null;
+        }
+      });
+
+      return prevBooks;
+    });
   };
 
   const handleReturn = async (book: Book): Promise<void> => {
@@ -154,6 +167,18 @@ export default function Page() {
         borrower: null,
       };
     });
+
+    setBooks(prev => {
+      const prevBooks = prev;
+      prevBooks.map(prevBook => {
+        if (prevBook.id === bookData.id) {
+          prevBook.available = true;
+          prevBook.borrower = null;
+        }
+      });
+
+      return prevBooks;
+    });
   };
 
   return (
@@ -163,10 +188,10 @@ export default function Page() {
           onClick={closeBookDetail}
           className="w-screen h-screen bg-slate-900 opacity-40 backdrop-blur-md absolute top-0 left-0"></div>
       )}
-      <div>
-        <h1>list</h1>
+      <div className="mt-10 max-w-lg mx-auto">
+        <h1 className="text-center mb-4">所蔵一覧</h1>
         {books.length > 0 && (
-          <div>
+          <div className="border-t">
             <ul>
               {books.map(book => {
                 return (
@@ -178,53 +203,35 @@ export default function Page() {
                 );
               })}
             </ul>
-            <button
-              onClick={handlePrev}
-              disabled={page == 1}
-              className="disabled:bg-blue-200 bg-blue-500 text-white">
-              prev
-            </button>
-            <p>
-              {page}/{lastPage}
-            </p>
-            <button
-              onClick={handleNext}
-              disabled={page >= lastPage}
-              className="disabled:bg-blue-200 bg-blue-500 text-white">
-              next
-            </button>
+            <div className="mt-6 flex justify-center items-center gap-5 [&>button]:rounded [&>button]:px-4 [&>button]:py-2 [&>button]:bg-blue-500 [&>button]:text-white [&>button]:text-sm [&>button]:shadow">
+              <button
+                onClick={handlePrev}
+                disabled={page == 1}
+                className="disabled:bg-slate-300 hover:bg-blue-400">
+                前のページ
+              </button>
+              <p className="font-mono text-slate-500 text-xs leading-loose">
+                {page}
+                <span className="mx-0.5">/</span>
+                {lastPage}
+              </p>
+              <button
+                onClick={handleNext}
+                disabled={page >= lastPage}
+                className="disabled:bg-slate-300 hover:bg-blue-400">
+                次のページ
+              </button>
+            </div>
           </div>
         )}
       </div>
-      {isDetailShow && (
-        <div className="absolute w-1/2 h-1/2 bg-white left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 p-10">
-          <h2 className="text-2xl">{activeBook?.title}</h2>
-          <ul>
-            <li>追加日：{activeBook?.addedDate.substring(0, 10)}</li>
-            <li>在庫：{activeBook?.available ? '在庫あり' : '貸出中'}</li>
-            <li>
-              カテゴリー：
-              {activeBook?.genres.map((genre, index) => {
-                return (
-                  <span
-                    className="mx-1 py-0.5 px-1 border border-slate-300 rounded-md"
-                    key={index}>
-                    {genre}
-                  </span>
-                );
-              })}
-            </li>
-          </ul>
-          {activeBook ? (
-            activeBook.available ? (
-              <button onClick={() => handleCheckout(activeBook)}>貸出</button>
-            ) : activeBook.borrower === currentUser?.id ? (
-              <button onClick={() => handleReturn(activeBook)}>返却</button>
-            ) : (
-              <p>現在貸出中です</p>
-            )
-          ) : null}
-        </div>
+      {isDetailShow && activeBook && currentUser && (
+        <BookDetail
+          activeBook={activeBook}
+          handleCheckout={() => handleCheckout(activeBook)}
+          handleReturn={() => handleReturn(activeBook)}
+          currentUser={currentUser}
+        />
       )}
     </>
   );

@@ -18,19 +18,19 @@ export default function AuthLayout({
     if (!loading && currentUser === null) {
       setTimeout(() => {
         router.push('/');
-      }, 1000);
+      }, 1500);
     }
   }, [currentUser, loading, router]);
 
   return loading ? (
-    <p>loading</p>
+    <p className="text-slate-500 text-sm text-center">ローディング...</p>
   ) : currentUser !== null ? (
     <>{children}</>
   ) : (
-    <p>
-      you are not logged in.
+    <p className="text-slate-500 text-sm text-center">
+      ログインしていません。
       <br />
-      redirect to home.
+      ログイン画面へ戻ります。
     </p>
   );
 }

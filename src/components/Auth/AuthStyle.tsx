@@ -17,14 +17,18 @@ export default function AuthStyle({
 }: AuthStyleProps) {
   return (
     <>
-      <h1>{title}</h1>
-      <div>
+      <h1 className="my-10 text-center text-lg font-medium text-blue-500">
+        {title}
+      </h1>
+      <div className="px-4 w-full max-w-md mx-auto">
         {children}
-        <Link
-          href={linkRef}
-          className="text-blue-600 underline underline-offset-4">
-          {linkText}
-        </Link>
+        <div className="mt-8 flex justify-end">
+          <Link
+            href={linkRef}
+            className="text-sm text-blue-500 underline underline-offset-2 hover:text-blue-400">
+            {linkText}
+          </Link>
+        </div>
       </div>
     </>
   );
