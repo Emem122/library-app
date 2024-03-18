@@ -23,11 +23,11 @@ export default function Header() {
     <>
       <header className="px-4 py-2 flex items-center justify-between border-b mb-4 h-12">
         {(userStatus === 'no login' || userStatus === 'loading') && (
-          <Link href="/">書庫管理アプリ</Link>
+          <Link href="/">図書管理アプリ</Link>
         )}
         {userStatus === 'logged in' && (
           <>
-            <Link href="/home">書庫管理アプリ</Link>
+            <Link href="/home">図書管理アプリ</Link>
             <div className="flex items-center gap-3">
               <p className="text-slate-500 text-xs">{currentUser?.name}</p>
               <button
