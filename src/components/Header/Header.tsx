@@ -1,14 +1,15 @@
 'use client';
 
+import { auth } from '@/firebase';
+import { useAuthState } from 'react-firebase-hooks/auth';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/providers/auth';
 import Link from 'next/link';
-import useUserStatus from '@/hooks/useUserStatus';
 
 export default function Header() {
   const router = useRouter();
   const currentUser = useAuth(state => state.currentUser);
-  const userStatus = useUserStatus();
+  const [user] = useAuthState(auth);
 
   const logOut = useAuth(state => state.logOut);
 
@@ -22,10 +23,7 @@ export default function Header() {
   return (
     <>
       <header className="px-4 py-2 flex items-center justify-between border-b mb-4 h-12">
-        {(userStatus === 'no login' || userStatus === 'loading') && (
-          <Link href="/">図書管理アプリ</Link>
-        )}
-        {userStatus === 'logged in' && (
+        {user ? (
           <>
             <Link href="/home">図書管理アプリ</Link>
             <div className="flex items-center gap-3">
@@ -37,6 +35,8 @@ export default function Header() {
               </button>
             </div>
           </>
+        ) : (
+          <Link href="/">図書管理アプリ</Link>
         )}
       </header>
     </>
