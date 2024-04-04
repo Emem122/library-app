@@ -9,29 +9,29 @@ export default function useUserStatus() {
   const currentUser = useAuth(state => state.currentUser);
   const [userStatus, setUserStatus] = useState('loading');
 
-  useEffect(() => {
-    if (currentUser === null) {
-      setUserStatus('no login');
+  // useEffect(() => {
+  //   if (currentUser === null) {
+  //     setUserStatus('no login');
 
-      if (pathname === '/home' || pathname === '/list' || pathname === '/add') {
-        setTimeout(() => {
-          router.push('/');
-        }, 1500);
-      }
-    } else if (currentUser !== null && currentUser !== undefined) {
-      setUserStatus('logged in');
+  //     if (pathname === '/home' || pathname === '/list' || pathname === '/add') {
+  //       setTimeout(() => {
+  //         router.push('/');
+  //       }, 1500);
+  //     }
+  //   } else if (currentUser !== null && currentUser !== undefined) {
+  //     setUserStatus('logged in');
 
-      if (
-        pathname === '/' ||
-        pathname === '/register' ||
-        pathname === '/login'
-      ) {
-        setTimeout(() => {
-          router.push('/home');
-        }, 1500);
-      }
-    }
-  }, [currentUser, router, pathname]);
+  //     if (
+  //       pathname === '/' ||
+  //       pathname === '/register' ||
+  //       pathname === '/login'
+  //     ) {
+  //       setTimeout(() => {
+  //         router.push('/home');
+  //       }, 1500);
+  //     }
+  //   }
+  // }, [currentUser, router, pathname]);
 
   return userStatus;
 }
