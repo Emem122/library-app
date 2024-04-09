@@ -38,7 +38,10 @@ export default function Home() {
   return (
     <div className="max-w-lg mx-auto">
       <main>
-        <div className="my-10 flex justify-center gap-5 *:px-12 *:py-4 *:block *:text-white *:rounded *:shadow-md">
+        <h1 className="mt-16 md:mt-24 md:mb-16 text-center font-medium text-lg md:text-xl">
+          図書管理アプリへようこそ 🎉
+        </h1>
+        <div className="my-10 flex-col md:flex-row flex items-center justify-center gap-5 *:px-12 *:py-4 *:block *:text-white *:rounded *:shadow-md *:text-center *:w-full *:max-w-60">
           <Link href="/login" className="bg-blue-500 hover:bg-blue-400">
             ログイン
           </Link>
