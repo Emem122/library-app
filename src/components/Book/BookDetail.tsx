@@ -32,11 +32,15 @@ export default function BookDetail({
         </li>
         <li>
           <p className="w-24 shrink-0 text-blue-400 text-sm">カテゴリー</p>
-          <div className="flex flex-wrap gap-2 [&>*]:rounded [&>*]:bg-slate-200 [&>*]:text-slate-500 [&>*]:py-0.5 [&>*]:px-2 [&>*]:text-xs">
-            {activeBook?.genres.map((genre, index) => {
-              return <p key={index}>{genre}</p>;
-            })}
-          </div>
+          {activeBook?.genres.length > 0 ? (
+            <div className="flex flex-wrap gap-2 [&>*]:rounded [&>*]:bg-slate-200 [&>*]:text-slate-500 [&>*]:py-0.5 [&>*]:px-2 [&>*]:text-xs">
+              {activeBook?.genres.map((genre, index) => {
+                return <p key={index}>{genre}</p>;
+              })}
+            </div>
+          ) : (
+            <p className="text-sm">なし</p>
+          )}
         </li>
       </ul>
       <div className="flex justify-center [&>*]:px-8 [&>*]:py-2 [&>*]:shadow [&>*]:text-white [&>*]:rounded">

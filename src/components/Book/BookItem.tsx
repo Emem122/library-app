@@ -30,11 +30,13 @@ export default function BookItem({ book, showBookDetail }: BookItemType) {
             )}
           </div>
         </div>
-        <ul className="mt-3 flex gap-2 [&>*]:rounded [&>*]:bg-slate-200 [&>*]:text-slate-500 [&>*]:py-0.5 [&>*]:px-2 [&>*]:text-xs">
-          {book.genres.map(genre => {
-            return <li key={genre}>{genre}</li>;
-          })}
-        </ul>
+        {book.genres.length > 0 && (
+          <ul className="mt-3 flex gap-2 [&>*]:rounded [&>*]:bg-slate-200 [&>*]:text-slate-500 [&>*]:py-0.5 [&>*]:px-2 [&>*]:text-xs">
+            {book.genres.map(genre => {
+              return <li key={genre}>{genre}</li>;
+            })}
+          </ul>
+        )}
       </li>
     </>
   );
